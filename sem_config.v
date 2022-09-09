@@ -13,3 +13,6 @@
 `define AHB_SEM_ADDR_WIDTH 8
 
 `define SYSTEM_CORE_NUM 2
+
+`define HSEM_DFLT_OWNER 8'h0
+

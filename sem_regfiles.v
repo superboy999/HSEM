@@ -18,12 +18,13 @@
 `define HSEM_RESOURCE_5_OFFSET        8'h14 //real_offset=0x14=
 `define HSEM_RESOURCE_6_OFFSET        8'h18 //real_offset=0x18
 `define HSEM_RESOURCE_7_OFFSET        8'h1c //real_offset=0x1c
-
-`define HSEM_INTERRUPT_1_OFFSET         8'h20
+// own to Core1
+`define HSEM_INTERRUPT_1_OFFSET         8'h20 //controled in ine module
 `define HSEM_INTERRUPT_CLEAR_1_OFFSET   8'h24
 `define HSEM_ERROR_1_OFFSET             8'h28
 `define HSEM_ERROR_CLEAR_1_OFFSET       8'h2c
-`define HSEM_STATUS_1_OFFSET            8'h30
+`define HSEM_STATUS_1_OFFSET            8'h30 //record the attribution of the resource
+// own to Core2
 `define HSEM_INTERRUPT_2_OFFSET         8'h34
 `define HSEM_INTERRUPT_CLEAR_2_OFFSET   8'h38
 `define HSEM_ERROR_2_OFFSET             8'h3c
@@ -64,6 +65,33 @@ module hsem_regfiles
     wire    err_clr_reg_en_2;
     wire    status_reg_en_2;
 
+    reg [`SEM_REG_WIDTH-1:0]  sem_0;
+    reg [`SEM_REG_WIDTH-1:0]  sem_1;
+    reg [`SEM_REG_WIDTH-1:0]  sem_2;
+    reg [`SEM_REG_WIDTH-1:0]  sem_3;
+    reg [`SEM_REG_WIDTH-1:0]  sem_4;
+    reg [`SEM_REG_WIDTH-1:0]  sem_5;
+    reg [`SEM_REG_WIDTH-1:0]  sem_6;
+    reg [`SEM_REG_WIDTH-1:0]  sem_7;
+
+    wire [`SEM_REG_WIDTH-1:0]  sem_0_iw; //internal wire connected to the reg sem_0
+    wire [`SEM_REG_WIDTH-1:0]  sem_1_iw;
+    wire [`SEM_REG_WIDTH-1:0]  sem_2_iw;
+    wire [`SEM_REG_WIDTH-1:0]  sem_3_iw;
+    wire [`SEM_REG_WIDTH-1:0]  sem_4_iw;
+    wire [`SEM_REG_WIDTH-1:0]  sem_5_iw;
+    wire [`SEM_REG_WIDTH-1:0]  sem_6_iw;
+    wire [`SEM_REG_WIDTH-1:0]  sem_7_iw;
+
+    wire  sem_0_rls; //internal wire connected to the reg sem_0
+    wire  sem_1_rls;
+    wire  sem_2_rls;
+    wire  sem_3_rls;
+    wire  sem_4_rls;
+    wire  sem_5_rls;
+    wire  sem_6_rls;
+    wire  sem_7_rls;
+
     assign  resource_0_en = (reg_addr == `HSEM_RESOURCE_0_OFFSET) ? 1'b1 : 1'b0;
     assign  resource_1_en = (reg_addr == `HSEM_RESOURCE_1_OFFSET) ? 1'b1 : 1'b0;
     assign  resource_2_en = (reg_addr == `HSEM_RESOURCE_2_OFFSET) ? 1'b1 : 1'b0;
@@ -73,8 +101,213 @@ module hsem_regfiles
     assign  resource_6_en = (reg_addr == `HSEM_RESOURCE_6_OFFSET) ? 1'b1 : 1'b0;
     assign  resource_7_en = (reg_addr == `HSEM_RESOURCE_7_OFFSET) ? 1'b1 : 1'b0;
 
-    assign int_reg_en_1       = (reg_addr == `HSEM_INTERRUPT_1_OFFSET) ? 1'b1 : 1'b0;
-    assign int_clr_reg_en_1   = (reg_addr == `HSEM_INTERRUPT_CLEAR_1_OFFSET) ? 1'b1 : 1'b0;
+    assign  sem_0_rls     = (resource_0_en && wr_en && (hwdata == 1));
+    assign  sem_1_rls     = (resource_1_en && wr_en && (hwdata == 1));
+    assign  sem_2_rls     = (resource_2_en && wr_en && (hwdata == 1));
+    assign  sem_3_rls     = (resource_3_en && wr_en && (hwdata == 1));
+    assign  sem_4_rls     = (resource_4_en && wr_en && (hwdata == 1));
+    assign  sem_5_rls     = (resource_5_en && wr_en && (hwdata == 1));
+    assign  sem_6_rls     = (resource_6_en && wr_en && (hwdata == 1));
+    assign  sem_7_rls     = (resource_7_en && wr_en && (hwdata == 1));
+
+// own to the Core 1
+    assign  int_reg_en_1      = (reg_addr == `HSEM_INTERRUPT_1_OFFSET      ) ? 1'b1 : 1'b0;
+    assign  int_clr_reg_en_1  = (reg_addr == `HSEM_INTERRUPT_CLEAR_1_OFFSET) ? 1'b1 : 1'b0;
     assign  err_reg_en_1      = (reg_addr == `HSEM_ERROR_1_OFFSET          ) ? 1'b1 : 1'b0;
     assign  err_clr_reg_en_1  = (reg_addr == `HSEM_ERROR_CLEAR_1_OFFSET    ) ? 1'b1 : 1'b0;
     assign  status_reg_en_1   = (reg_addr == `HSEM_STATUS_1_OFFSET         ) ? 1'b1 : 1'b0;
+// own to the Core 2
+    assign  int_reg_en_2      = (reg_addr == `HSEM_INTERRUPT_2_OFFSET      ) ? 1'b1 : 1'b0;
+    assign  int_clr_reg_en_2  = (reg_addr == `HSEM_INTERRUPT_CLEAR_2_OFFSET) ? 1'b1 : 1'b0;
+    assign  err_reg_en_2      = (reg_addr == `HSEM_ERROR_2_OFFSET          ) ? 1'b1 : 1'b0;
+    assign  err_clr_reg_en_2  = (reg_addr == `HSEM_ERROR_CLEAR_2_OFFSET    ) ? 1'b1 : 1'b0;
+    assign  status_reg_en_2   = (reg_addr == `HSEM_STATUS_2_OFFSET         ) ? 1'b1 : 1'b0;
+
+// ------------------------------------------------------
+// -- semaphore reg
+// ------------------------------------------------------
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_0
+            if(hresetn == 1'b0)
+                sem_0 <= 0;
+            else
+                begin
+                    if(resource_0_en && wr_en)
+                        begin
+                            sem_0[0] <= hwdata[0];
+                            sem_0[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_0_rls)
+                        begin
+                            sem_0[0] <= hwdata[0];
+                            sem_0[15:8] <= 0;
+                        end
+                end
+        end
+
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_1
+            if(hresetn == 1'b0)
+                sem_1 <= 0;
+            else
+                begin
+                    if(resource_1_en && wr_en)
+                        begin
+                            sem_1[0] <= hwdata[0];
+                            sem_1[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_1_rls)
+                        begin
+                            sem_1[0] <= hwdata[0];
+                            sem_1[15:8] <= 0;
+                        end
+                end
+        end
+
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_2
+            if(hresetn == 1'b0)
+                sem_2 <= 0;
+            else
+                begin
+                    if(resource_2_en && wr_en)
+                        begin
+                            sem_2[0] <= hwdata[0];
+                            sem_2[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_2_rls)
+                        begin
+                            sem_2[0] <= hwdata[0];
+                            sem_2[15:8] <= 0;
+                        end
+                end
+        end
+        
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_3
+            if(hresetn == 1'b0)
+                sem_3 <= 0;
+            else
+                begin
+                    if(resource_3_en && wr_en)
+                        begin
+                            sem_3[0] <= hwdata[0];
+                            sem_3[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_3_rls)
+                        begin
+                            sem_3[0] <= hwdata[0];
+                            sem_3[15:8] <= 0;
+                        end
+                end
+        end
+
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_4
+            if(hresetn == 1'b0)
+                sem_4 <= 0;
+            else
+                begin
+                    if(resource_4_en && wr_en)
+                        begin
+                            sem_4[0] <= hwdata[0];
+                            sem_4[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_4_rls)
+                        begin
+                            sem_4[0] <= hwdata[0];
+                            sem_4[15:8] <= 0;
+                        end
+                end
+        end
+        
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_5
+            if(hresetn == 1'b0)
+                sem_5 <= 0;
+            else
+                begin
+                    if(resource_5_en && wr_en)
+                        begin
+                            sem_5[0] <= hwdata[0];
+                            sem_5[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_5_rls)
+                        begin
+                            sem_5[0] <= hwdata[0];
+                            sem_5[15:8] <= 0;
+                        end
+                end
+        end
+
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_6
+            if(hresetn == 1'b0)
+                sem_6 <= 0;
+            else
+                begin
+                    if(resource_6_en && wr_en)
+                        begin
+                            sem_6[0] <= hwdata[0];
+                            sem_6[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_6_rls)
+                        begin
+                            sem_6[0] <= hwdata[0];
+                            sem_6[15:8] <= 0;
+                        end
+                end
+        end
+        
+    always@(posedge hclk or negedge hresetn)
+        begin : sem_7
+            if(hresetn == 1'b0)
+                sem_7 <= 0;
+            else
+                begin
+                    if(resource_7_en && wr_en)
+                        begin
+                            sem_7[0] <= hwdata[0];
+                            sem_7[15:8] <= hwdata[15:8];
+                        end
+                    else if(sem_7_rls)
+                        begin
+                            sem_7[0] <= hwdata[0];
+                            sem_7[15:8] <= 0;
+                        end
+                end
+        end
+
+    assign sem_0_iw = sem_0;
+    assign sem_1_iw = sem_1;
+    assign sem_2_iw = sem_2;
+    assign sem_3_iw = sem_3;
+    assign sem_4_iw = sem_4;
+    assign sem_5_iw = sem_5;
+    assign sem_6_iw = sem_6;
+    assign sem_7_iw = sem_7;
+
+    always@(*)
+        begin : READ_SEM_PROC
+
+            hrdata = {32{1'b0}};
+
+            if(resource_0_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_0_iw[`SEM_REG_WIDTH-1:0];
+            if(resource_1_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_1_iw[`SEM_REG_WIDTH-1:0];
+            if(resource_2_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_2_iw[`SEM_REG_WIDTH-1:0];
+            if(resource_3_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_3_iw[`SEM_REG_WIDTH-1:0];
+            if(resource_4_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_4_iw[`SEM_REG_WIDTH-1:0];
+            if(resource_5_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_5_iw[`SEM_REG_WIDTH-1:0];
+            if(resource_6_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_6_iw[`SEM_REG_WIDTH-1:0];
+            if(resource_7_en == 1'b1)
+                hrdata[`SEM_REG_WIDTH-1:0]  = sem_7_iw[`SEM_REG_WIDTH-1:0];
+        end
+
+endmodule
