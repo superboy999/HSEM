@@ -290,7 +290,7 @@ module hsem_regfiles
     always@(*)
         begin : READ_SEM_PROC
 
-            hrdata = {32{1'b0}};
+            hrdata = {32{1'b0}}; // in the combinational circuit, this line is to prevent the latch condition
 
             if(resource_0_en == 1'b1)
                 hrdata[`SEM_REG_WIDTH-1:0]  = sem_0_iw[`SEM_REG_WIDTH-1:0];
