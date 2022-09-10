@@ -16,3 +16,12 @@
 
 `define HSEM_DFLT_OWNER 8'h0
 
+`define CORE_0_ID 8'haa
+
+`define CORE_1_ID 8'hbb
+
+`define RESOURCE_NUM 8
+
+`define ERROR_REG_WIDTH 32
+
+`define INTR_REG_WIDTH 32
