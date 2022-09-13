@@ -3,7 +3,7 @@
 // Author :                     superboy
 // Created date :               2022/09/09
 // Abstract     :               config file for the HSEM.
-// Last modified date :         2022/09/09
+// Last modified date :         2022/09/1
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
 `define AHB_DATA_WIDTH 32
@@ -32,4 +32,4 @@
 
 `define SEMERR_WIDTH 32
 
-`define SEMNUM_WIDTH 6
+`define SEMNUM_WIDTH 5 //different from databook 6

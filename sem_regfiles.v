@@ -3,7 +3,7 @@
 // Author:                      superboy
 // Created date :               2022/09/09
 // Abstract     :               Register Block module for the HSEM macrocell.
-// Last modified date :         2022/09/10
+// Last modified date :         2022/09/13
 // Description:                 In this module, only those regs related to the semaphore will appear in this module, those regs related to the interrupt or error will appear in ine.v
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
@@ -125,7 +125,7 @@ module hsem_regfiles
     wire [`SEM_REG_WIDTH-1:0]  sem_6_iw;
     wire [`SEM_REG_WIDTH-1:0]  sem_7_iw;
 
-    wire  sem_0_rls; //internal wire connected to the reg sem_0
+    wire  sem_0_rls; //release
     wire  sem_1_rls;
     wire  sem_2_rls;
     wire  sem_3_rls;
@@ -133,6 +133,15 @@ module hsem_regfiles
     wire  sem_5_rls;
     wire  sem_6_rls;
     wire  sem_7_rls;
+
+    wire  sem_0_lck; //lock
+    wire  sem_1_lck;
+    wire  sem_2_lck;
+    wire  sem_3_lck;
+    wire  sem_4_lck;
+    wire  sem_5_lck;
+    wire  sem_6_lck;
+    wire  sem_7_lck;
 
     assign  resource_0_en = (reg_addr == `HSEM_RESOURCE_0_OFFSET) ? 1'b1 : 1'b0;
     assign  resource_1_en = (reg_addr == `HSEM_RESOURCE_1_OFFSET) ? 1'b1 : 1'b0;
@@ -151,6 +160,15 @@ module hsem_regfiles
     assign  sem_5_rls     = (resource_5_en && wr_en && (hwdata == 1));
     assign  sem_6_rls     = (resource_6_en && wr_en && (hwdata == 1));
     assign  sem_7_rls     = (resource_7_en && wr_en && (hwdata == 1));
+
+    assign  sem_0_lck     = (resource_0_en && wr_en && (hwdata == 0));
+    assign  sem_1_lck     = (resource_1_en && wr_en && (hwdata == 0));
+    assign  sem_2_lck     = (resource_2_en && wr_en && (hwdata == 0));
+    assign  sem_3_lck     = (resource_3_en && wr_en && (hwdata == 0));
+    assign  sem_4_lck     = (resource_4_en && wr_en && (hwdata == 0));
+    assign  sem_5_lck     = (resource_5_en && wr_en && (hwdata == 0));
+    assign  sem_6_lck     = (resource_6_en && wr_en && (hwdata == 0));
+    assign  sem_7_lck     = (resource_7_en && wr_en && (hwdata == 0));
 
 // own to the Core 0
     assign  int_reg_en        = (reg_addr == `HSEM_INTERRUPT_OFFSET      ) ? 1'b1 : 1'b0;
@@ -174,15 +192,20 @@ module hsem_regfiles
                 sem_0 <= 0;
             else
                 begin
-                    if(resource_0_en && wr_en)
-                        begin
-                            sem_0[0] <= ihwdata[0];
-                            sem_0[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_0_rls)
+                    // if(resource_0_en && wr_en)
+                    //     begin
+                    //         sem_0[0] <= ihwdata[0];
+                    //         sem_0[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_0_rls)
                         begin
                             sem_0[0] <= ihwdata[0];
                             sem_0[15:8] <= 0;
+                        end
+                    else if(sem_0_lck)
+                        begin
+                            sem_0[0] <= ihwdata[0];
+                            sem_0[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -193,15 +216,20 @@ module hsem_regfiles
                 sem_1 <= 0;
             else
                 begin
-                    if(resource_1_en && wr_en)
-                        begin
-                            sem_1[0] <= ihwdata[0];
-                            sem_1[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_1_rls)
+                    // if(resource_1_en && wr_en)
+                    //     begin
+                    //         sem_1[0] <= ihwdata[0];
+                    //         sem_1[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_1_rls)
                         begin
                             sem_1[0] <= ihwdata[0];
                             sem_1[15:8] <= 0;
+                        end
+                    else if(sem_1_lck)
+                        begin
+                            sem_1[0] <= ihwdata[0];
+                            sem_1[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -212,15 +240,20 @@ module hsem_regfiles
                 sem_2 <= 0;
             else
                 begin
-                    if(resource_2_en && wr_en)
-                        begin
-                            sem_2[0] <= ihwdata[0];
-                            sem_2[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_2_rls)
+                    // if(resource_2_en && wr_en)
+                    //     begin
+                    //         sem_2[0] <= ihwdata[0];
+                    //         sem_2[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_2_rls)
                         begin
                             sem_2[0] <= ihwdata[0];
                             sem_2[15:8] <= 0;
+                        end
+                    else if(sem_2_lck)
+                        begin
+                            sem_2[0] <= ihwdata[0];
+                            sem_2[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -231,15 +264,20 @@ module hsem_regfiles
                 sem_3 <= 0;
             else
                 begin
-                    if(resource_3_en && wr_en)
-                        begin
-                            sem_3[0] <= ihwdata[0];
-                            sem_3[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_3_rls)
+                    // if(resource_3_en && wr_en)
+                    //     begin
+                    //         sem_3[0] <= ihwdata[0];
+                    //         sem_3[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_3_rls)
                         begin
                             sem_3[0] <= ihwdata[0];
                             sem_3[15:8] <= 0;
+                        end
+                    else if(sem_3_lck)
+                        begin
+                            sem_3[0] <= ihwdata[0];
+                            sem_3[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -250,15 +288,20 @@ module hsem_regfiles
                 sem_4 <= 0;
             else
                 begin
-                    if(resource_4_en && wr_en)
-                        begin
-                            sem_4[0] <= ihwdata[0];
-                            sem_4[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_4_rls)
+                    // if(resource_4_en && wr_en)
+                    //     begin
+                    //         sem_4[0] <= ihwdata[0];
+                    //         sem_4[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_4_rls)
                         begin
                             sem_4[0] <= ihwdata[0];
                             sem_4[15:8] <= 0;
+                        end
+                    else if(sem_4_lck)
+                        begin
+                            sem_4[0] <= ihwdata[0];
+                            sem_4[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -269,15 +312,20 @@ module hsem_regfiles
                 sem_5 <= 0;
             else
                 begin
-                    if(resource_5_en && wr_en)
-                        begin
-                            sem_5[0] <= ihwdata[0];
-                            sem_5[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_5_rls)
+                    // if(resource_5_en && wr_en)
+                    //     begin
+                    //         sem_5[0] <= ihwdata[0];
+                    //         sem_5[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_5_rls)
                         begin
                             sem_5[0] <= ihwdata[0];
                             sem_5[15:8] <= 0;
+                        end
+                    else if(sem_5_lck)
+                        begin
+                            sem_5[0] <= ihwdata[0];
+                            sem_5[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -288,15 +336,20 @@ module hsem_regfiles
                 sem_6 <= 0;
             else
                 begin
-                    if(resource_6_en && wr_en)
-                        begin
-                            sem_6[0] <= ihwdata[0];
-                            sem_6[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_6_rls)
+                    // if(resource_6_en && wr_en)
+                    //     begin
+                    //         sem_6[0] <= ihwdata[0];
+                    //         sem_6[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_6_rls)
                         begin
                             sem_6[0] <= ihwdata[0];
                             sem_6[15:8] <= 0;
+                        end
+                    else if(sem_6_lck)
+                        begin
+                            sem_6[0] <= ihwdata[0];
+                            sem_6[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -307,15 +360,20 @@ module hsem_regfiles
                 sem_7 <= 0;
             else
                 begin
-                    if(resource_7_en && wr_en)
-                        begin
-                            sem_7[0] <= ihwdata[0];
-                            sem_7[15:8] <= ihwdata[15:8];
-                        end
-                    else if(sem_7_rls)
+                    // if(resource_7_en && wr_en)
+                    //     begin
+                    //         sem_7[0] <= ihwdata[0];
+                    //         sem_7[15:8] <= ihwdata[15:8];
+                    //     end
+                    if(sem_7_rls)
                         begin
                             sem_7[0] <= ihwdata[0];
                             sem_7[15:8] <= 0;
+                        end
+                    else if(sem_7_lck)
+                        begin
+                            sem_7[0] <= ihwdata[0];
+                            sem_7[15:8] <= ihwdata[15:8];
                         end
                 end
         end
@@ -384,9 +442,453 @@ module hsem_regfiles
 //-----------------------------------------------------------------------
 
     always@(*)
-        begin : ERR_CODE_PROC
-            err_code = {3{1'b1}};
-
+        begin : SEMERR_PROC
+            faultid  = {8{1'b1}};
+            semnum   = {5{1'b1}};
+            err_code = {3{1'b1}}
+            //In this proc, we will use if to judge every semaphore
+            if(resource_0_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
+            if(resource_1_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
+            if(resource_2_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
+            if(resource_3_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
+            if(resource_4_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
+            if(resource_5_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
+            if(resource_6_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
+            if(resource_7_en == 1'b1) //semaphore 0 error
+                begin
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                        begin
+                            err_code = 3'b0;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                        begin
+                            err_code = 3'b1;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
+                    //     begin
+                    //         err_code = 3'b3;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    //     begin
+                    //         err_code = 3'b4;
+                    //         semnum = 5'b0;
+                    //         if(ihwdata[15:8]==`CORE_0_ID)
+                    //             begin
+                    //                 faultid = `CORE_0_ID;
+                    //             end
+                    //         else if(ihwdata[15:8]==`CORE_1_ID)
+                    //             begin
+                    //                 faultid = `CORE_1_ID;
+                    //             end
+                    //     end
+                end
         end
+    
+    assign semerr = {16'b0,faultid,semnum,err_code}
 
 endmodule
