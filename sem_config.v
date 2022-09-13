@@ -16,6 +16,8 @@
 
 `define HSEM_DFLT_OWNER 8'h0
 
+`define CORE_ID_WIDTH 8
+
 `define CORE_0_ID 8'haa
 
 `define CORE_1_ID 8'hbb
@@ -25,3 +27,9 @@
 `define ERROR_REG_WIDTH 32
 
 `define INTR_REG_WIDTH 32
+
+`define ERR_CODE_WIDTH 3
+
+`define SEMERR_WIDTH 32
+
+`define SEMNUM_WIDTH 6

@@ -47,6 +47,7 @@ module hsem_regfiles
         int_clr_reg_en,
         err_reg_en,
         err_clr_reg_en,
+        semerr //add this connect to the ine module
         // int_reg_en_1,
         // int_clr_reg_en_1,
         // err_reg_en_1,
@@ -66,6 +67,7 @@ module hsem_regfiles
     output  int_clr_reg_en;
     output  err_reg_en;
     output  err_clr_reg_en;
+    output  [`SEMERR_WIDTH-1:0]         semerr;
     // output  int_reg_en_1;
     // output  int_clr_reg_en_1;
     // output  err_reg_en_1;
@@ -84,6 +86,10 @@ module hsem_regfiles
     wire    int_clr_reg_en;
     wire    err_reg_en;
     wire    err_clr_reg_en;
+    wire    [`ERR_CODE_WIDTH-1:0]   err_code;
+    wire    [`SEMNUM_WIDTH-1:0]     semnum;
+    wire    [`CORE_ID_WIDTH-1:0]    faultid;
+// module internal wire
     wire    status_reg_en;
 
     // wire    int_reg_en_1;
@@ -358,6 +364,7 @@ module hsem_regfiles
                 ihrdata[`SEM_REG_WIDTH-1:0]  = {32{1'b0}};
         end
 
+//-----------------------------------------------------------------------
     assign sem_status_0[0] = (sem_0_iw[15:8] == CORE_0_ID) ? 1'b1 : 1'b0; 
     assign sem_status_0[1] = (sem_1_iw[15:8] == CORE_0_ID) ? 1'b1 : 1'b0; 
     assign sem_status_0[2] = (sem_2_iw[15:8] == CORE_0_ID) ? 1'b1 : 1'b0; 
@@ -374,5 +381,12 @@ module hsem_regfiles
     assign sem_status_1[5] = (sem_5_iw[15:8] == CORE_1_ID) ? 1'b1 : 1'b0; 
     assign sem_status_1[6] = (sem_6_iw[15:8] == CORE_1_ID) ? 1'b1 : 1'b0; 
     assign sem_status_1[7] = (sem_7_iw[15:8] == CORE_1_ID) ? 1'b1 : 1'b0; 
+//-----------------------------------------------------------------------
+
+    always@(*)
+        begin : ERR_CODE_PROC
+            err_code = {3{1'b1}};
+
+        end
 
 endmodule
