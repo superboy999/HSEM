@@ -32,4 +32,12 @@
 
 `define SEMERR_WIDTH 32
 
-`define SEMNUM_WIDTH 5 //different from databook 6
+`define SEMNUM_WIDTH 5 //different from databook is:6
+
+// `define TASK_SWITCH 2'b01
+
+`define ERROR_PRODUCED 2'b01
+
+`define CORE_0_INTR 2'b10
+
+`define CORE_1_INTR 2'b11

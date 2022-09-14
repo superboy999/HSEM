@@ -15,13 +15,15 @@ module hsem_ine
     input   hresetn;
     input   wr_en;
     input   rd_en; //maybe delete later
+    input   [`AHB_DATA_WIDTH-1:0]   ihwdata;
     input   int_reg_en;
     input   int_clr_reg_en;
     input   err_reg_en;
     input   err_clr_reg_en;
     input   [`SEMERR_WIDTH-1:0]     semerr;
     output  [`ERROR_REG_WIDTH-1:0]  error_stat;
-    output  intr; //this signal will directly connect to the top level, connected to the core
+    output  intr_0; //this signal will directly connect to the top level, connected to the core
+    output  intr_1;
     output  [`INTR_REG_WIDTH-1:0]  intr_stat;
 
     reg [`ERROR_REG_WIDTH-1:0]  error;
@@ -29,7 +31,8 @@ module hsem_ine
 
     wire [`ERROR_REG_WIDTH-1:0]  err_iw; //internal wire
     wire [`INTR_REG_WIDTH-1:0]   intr_iw; //intr_stat internal wire
-    wire    intr;
+    wire    intr_0;
+    wire    intr1;
 
     assign  err_iw  = error;
     assign  intr_iw = interrupt;
@@ -50,13 +53,16 @@ module hsem_ine
                 end
         end
 
-
     always@(posedge hclk or negedge hresetn)
         begin : interrupt
             if(hresetn == 1'b0)
                 interrupt <= 32'b0;
             else if(error != 32'b0)
-                
+                interrupt <= `ERROR_PRODUCED;
+            else if(int_reg_en && wr_en)
+                interrupt <= ihwdata; //used to control interrupt to the target Core
+            else if(int_clr_reg_en)
+                interrupt <= 32'b0;
         end
 
     always@(*)
@@ -71,8 +77,8 @@ module hsem_ine
                 error_stat = err_iw;
         end
 
-    
-    
+    assign intr_0 = (interrupt == `CORE_0_INTR) ? 1'b1 : 1'b0;
+    assign intr_1 = (interrupt == `CORE_1_INTR) ? 1'b1 : 1'b0;    
 
 
 endmodule

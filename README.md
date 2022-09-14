@@ -21,3 +21,4 @@ Hardware semaphore for dual core communication, the whole architecture is design
 2. Error reg and interrupt reg has to be writeable **实际上感觉 error 这个寄存器不需要有写操作，代码里强行加了 error 这个寄存器，实际上只读的寄存器可以仅用 wire 类型实现的，这里强行例化了 reg，为了在 ine 模块里分割出来这个 error 的功能。** _虽然实际上功能都是基本上在 regfile 里实现的_
 3. 最后两个 error 的情况没办法用硬件实现，需要软件协同实现。
 4. 9.14 想到一个问题，就是需要一个 interrupt stat 的寄存器，里面就两个状态：软件中断或者 error 产生的中断；另外就是需要两个中断信号，一个给 core0,一个给 core1.
+5. 需要有特定的两个值来拉高对应 Core 的中断，见 config.v
