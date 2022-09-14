@@ -19,6 +19,7 @@ module hsem_ine
     input   int_clr_reg_en;
     input   err_reg_en;
     input   err_clr_reg_en;
+    input   [`SEMERR_WIDTH-1:0]     semerr;
     output  [`ERROR_REG_WIDTH-1:0]  error_stat;
     output  intr; //this signal will directly connect to the top level, connected to the core
     output  [`INTR_REG_WIDTH-1:0]  intr_stat;
@@ -32,6 +33,31 @@ module hsem_ine
 
     assign  err_iw  = error;
     assign  intr_iw = interrupt;
+
+    always@(posedge hclk or negedge hresetn)
+        begin : error
+            if(hresetn == 1'b0)
+                begin
+                    error <= 32'b0;
+                end
+            else if(err_clr_reg_en)
+                begin
+                    error <= 32'b0;
+                end
+            else
+                begin
+                    error <= semerr;
+                end
+        end
+
+
+    always@(posedge hclk or negedge hresetn)
+        begin : interrupt
+            if(hresetn == 1'b0)
+                interrupt <= 32'b0;
+            else if(error != 32'b0)
+                
+        end
 
     always@(*)
         begin : READ_INE_PROC

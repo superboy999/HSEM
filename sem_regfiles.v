@@ -152,23 +152,23 @@ module hsem_regfiles
     assign  resource_6_en = (reg_addr == `HSEM_RESOURCE_6_OFFSET) ? 1'b1 : 1'b0;
     assign  resource_7_en = (reg_addr == `HSEM_RESOURCE_7_OFFSET) ? 1'b1 : 1'b0;
 
-    assign  sem_0_rls     = (resource_0_en && wr_en && (hwdata == 1));
-    assign  sem_1_rls     = (resource_1_en && wr_en && (hwdata == 1));
-    assign  sem_2_rls     = (resource_2_en && wr_en && (hwdata == 1));
-    assign  sem_3_rls     = (resource_3_en && wr_en && (hwdata == 1));
-    assign  sem_4_rls     = (resource_4_en && wr_en && (hwdata == 1));
-    assign  sem_5_rls     = (resource_5_en && wr_en && (hwdata == 1));
-    assign  sem_6_rls     = (resource_6_en && wr_en && (hwdata == 1));
-    assign  sem_7_rls     = (resource_7_en && wr_en && (hwdata == 1));
-
-    assign  sem_0_lck     = (resource_0_en && wr_en && (hwdata == 0));
-    assign  sem_1_lck     = (resource_1_en && wr_en && (hwdata == 0));
-    assign  sem_2_lck     = (resource_2_en && wr_en && (hwdata == 0));
-    assign  sem_3_lck     = (resource_3_en && wr_en && (hwdata == 0));
-    assign  sem_4_lck     = (resource_4_en && wr_en && (hwdata == 0));
-    assign  sem_5_lck     = (resource_5_en && wr_en && (hwdata == 0));
-    assign  sem_6_lck     = (resource_6_en && wr_en && (hwdata == 0));
-    assign  sem_7_lck     = (resource_7_en && wr_en && (hwdata == 0));
+    assign  sem_0_rls     = (resource_0_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_0_iw[15:8])); //modify in 9.14，考虑到这个信号需要直接加上core match的因素才可以对semaphore进行读写。
+    assign  sem_1_rls     = (resource_1_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_1_iw[15:8]));
+    assign  sem_2_rls     = (resource_2_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_2_iw[15:8]));
+    assign  sem_3_rls     = (resource_3_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_3_iw[15:8]));
+    assign  sem_4_rls     = (resource_4_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_4_iw[15:8]));
+    assign  sem_5_rls     = (resource_5_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_5_iw[15:8]));
+    assign  sem_6_rls     = (resource_6_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_6_iw[15:8]));
+    assign  sem_7_rls     = (resource_7_en && wr_en && (ihwdata == 1) && (ihwdata[15:8] == sem_7_iw[15:8]));
+ii
+    assign  sem_0_lck     = (resource_0_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_0_iw[15:8])); //modify in 9.14
+    assign  sem_1_lck     = (resource_1_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_1_iw[15:8]));
+    assign  sem_2_lck     = (resource_2_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_2_iw[15:8]));
+    assign  sem_3_lck     = (resource_3_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_3_iw[15:8]));
+    assign  sem_4_lck     = (resource_4_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_4_iw[15:8]));
+    assign  sem_5_lck     = (resource_5_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_5_iw[15:8]));
+    assign  sem_6_lck     = (resource_6_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_6_iw[15:8]));
+    assign  sem_7_lck     = (resource_7_en && wr_en && (ihwdata == 0) && (ihwdata[15:8] == sem_7_iw[15:8]));
 
 // own to the Core 0
     assign  int_reg_en        = (reg_addr == `HSEM_INTERRUPT_OFFSET      ) ? 1'b1 : 1'b0;
@@ -447,9 +447,9 @@ module hsem_regfiles
             semnum   = {5{1'b1}};
             err_code = {3{1'b1}}
             //In this proc, we will use if to judge every semaphore
-            if(resource_0_en == 1'b1) //semaphore 0 error
+            if((resource_0_en == 1'b1) && wr_en) //semaphore 0 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_0_iw[15:8]==ihwdata[15:8]) && (sem_0_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -462,7 +462,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_0_iw[15:8]!=ihwdata[15:8]) && (sem_0_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -475,20 +475,20 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
+                    if((ihwdata[0]==0) && (sem_0_iw[15:8]==ihwdata[15:8]) && (sem_0_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
+                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error 删除这个机制吧
                     //     begin
                     //         err_code = 3'b4;
                     //         semnum = 5'b0;
@@ -502,9 +502,9 @@ module hsem_regfiles
                     //             end
                     //     end
                 end
-            if(resource_1_en == 1'b1) //semaphore 0 error
+            if((resource_1_en == 1'b1) && wr_en) //semaphore 1 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_1_iw[15:8]==ihwdata[15:8]) && (sem_1_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -517,7 +517,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_1_iw[15:8]!=ihwdata[15:8]) && (sem_1_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -530,36 +530,23 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
-                    //     begin
-                    //         err_code = 3'b4;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
+                    if((ihwdata[0]==0) && (sem_1_iw[15:8]==ihwdata[15:8]) && (sem_1_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
                 end
-            if(resource_2_en == 1'b1) //semaphore 0 error
+            if((resource_2_en == 1'b1) && wr_en) //semaphore 2 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_2_iw[15:8]==ihwdata[15:8]) && (sem_2_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -572,7 +559,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_2_iw[15:8]!=ihwdata[15:8]) && (sem_2_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -585,36 +572,23 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
-                    //     begin
-                    //         err_code = 3'b4;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
+                    if((ihwdata[0]==0) && (sem_2_iw[15:8]==ihwdata[15:8]) && (sem_2_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
                 end
-            if(resource_3_en == 1'b1) //semaphore 0 error
+            if((resource_3_en == 1'b1) && wr_en) //semaphore 3 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_3_iw[15:8]==ihwdata[15:8]) && (sem_3_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -627,7 +601,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_3_iw[15:8]!=ihwdata[15:8]) && (sem_3_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -640,36 +614,23 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
-                    //     begin
-                    //         err_code = 3'b4;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
+                    if((ihwdata[0]==0) && (sem_3_iw[15:8]==ihwdata[15:8]) && (sem_3_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
                 end
-            if(resource_4_en == 1'b1) //semaphore 0 error
+            if((resource_4_en == 1'b1) && wr_en) //semaphore 4 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_4_iw[15:8]==ihwdata[15:8]) && (sem_4_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -682,7 +643,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_4_iw[15:8]!=ihwdata[15:8]) && (sem_4_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -695,36 +656,23 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
-                    //     begin
-                    //         err_code = 3'b4;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
+                    if((ihwdata[0]==0) && (sem_4_iw[15:8]==ihwdata[15:8]) && (sem_4_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
                 end
-            if(resource_5_en == 1'b1) //semaphore 0 error
+            if((resource_5_en == 1'b1) && wr_en) //semaphore 5 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_5_iw[15:8]==ihwdata[15:8]) && (sem_5_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -737,7 +685,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_5_iw[15:8]!=ihwdata[15:8]) && (sem_5_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -750,36 +698,23 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
-                    //     begin
-                    //         err_code = 3'b4;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
+                    if((ihwdata[0]==0) && (sem_5_iw[15:8]==ihwdata[15:8]) && (sem_5_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
                 end
-            if(resource_6_en == 1'b1) //semaphore 0 error
+            if((resource_6_en == 1'b1) && wr_en) //semaphore 6 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_6_iw[15:8]==ihwdata[15:8]) && (sem_6_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -792,7 +727,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_6_iw[15:8]!=ihwdata[15:8]) && (sem_6_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -805,36 +740,23 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
-                    //     begin
-                    //         err_code = 3'b4;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
+                    if((ihwdata[0]==0) && (sem_6_iw[15:8]==ihwdata[15:8]) && (sem_6_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
                 end
-            if(resource_7_en == 1'b1) //semaphore 0 error
+            if((resource_7_en == 1'b1) && wr_en) //semaphore 7 error
                 begin
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Free Error
+                    if((ihwdata[0]==1) && (sem_7_iw[15:8]==ihwdata[15:8]) && (sem_7_iw[0]==1)) //Already Free Error
                         begin
                             err_code = 3'b0;
                             semnum = 5'b0;
@@ -847,7 +769,7 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Illegal Free Error
+                    if((ihwdata[0]==1) && (sem_7_iw[15:8]!=ihwdata[15:8]) && (sem_7_iw[0]==1)) //Illegal Free Error
                         begin
                             err_code = 3'b1;
                             semnum = 5'b0;
@@ -860,32 +782,19 @@ module hsem_regfiles
                                     faultid = `CORE_1_ID;
                                 end
                         end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]==sem_0_iw[15:8])) //Already Own error
-                    //     begin
-                    //         err_code = 3'b3;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
-                    // if((sem_0_iw[0]==ihwdata[0])&&(sem_0_iw[15:8]!=sem_0_iw[15:8])) //Already Requested Error
-                    //     begin
-                    //         err_code = 3'b4;
-                    //         semnum = 5'b0;
-                    //         if(ihwdata[15:8]==`CORE_0_ID)
-                    //             begin
-                    //                 faultid = `CORE_0_ID;
-                    //             end
-                    //         else if(ihwdata[15:8]==`CORE_1_ID)
-                    //             begin
-                    //                 faultid = `CORE_1_ID;
-                    //             end
-                    //     end
+                    if((ihwdata[0]==0) && (sem_7_iw[15:8]==ihwdata[15:8]) && (sem_7_iw[0]==0)) //Already Own error
+                        begin
+                            err_code = 3'b3;
+                            semnum = 5'b0;
+                            if(ihwdata[15:8]==`CORE_0_ID)
+                                begin
+                                    faultid = `CORE_0_ID;
+                                end
+                            else if(ihwdata[15:8]==`CORE_1_ID)
+                                begin
+                                    faultid = `CORE_1_ID;
+                                end
+                        end
                 end
         end
     
