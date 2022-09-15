@@ -9,12 +9,24 @@
 // -------------------------------------------------------------------
 module hsem_ine
     (
-
+        hclk,
+        hresetn,
+        wr_en,
+        ihwdata,
+        int_reg_en,
+        int_clr_reg_en,
+        err_reg_en,
+        err_clr_reg_en,
+        semerr,
+        error_stat,
+        intr_0,
+        intr_1,
+        intr_stat
     );
     input   hclk;
     input   hresetn;
     input   wr_en;
-    input   rd_en; //maybe delete later
+    // input   rd_en; //maybe delete later
     input   [`AHB_DATA_WIDTH-1:0]   ihwdata;
     input   int_reg_en;
     input   int_clr_reg_en;

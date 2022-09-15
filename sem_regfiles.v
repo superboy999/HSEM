@@ -31,6 +31,7 @@
 //`define HSEM_ERROR_1_OFFSET             8'h3c
 //`define HSEM_ERROR_CLEAR_1_OFFSET       8'h40
 `define HSEM_STATUS_1_OFFSET          8'h34
+`define TASK_SWITCH_OFFSET            8'h38
 
 module hsem_regfiles
     (
@@ -43,11 +44,13 @@ module hsem_regfiles
         ihrdata,
         intr_stat,//from ine
         error_stat,//from ine
+        tsk_stat,
         int_reg_en,
         int_clr_reg_en,
         err_reg_en,
         err_clr_reg_en,
-        semerr //add this connect to the ine module
+        semerr, //add this connect to the ine module
+        task_en
         // int_reg_en_1,
         // int_clr_reg_en_1,
         // err_reg_en_1,
@@ -62,12 +65,14 @@ module hsem_regfiles
     input   [`AHB_SEM_ADDR_WIDTH-1:0]   reg_addr;
     input   [`ERROR_REG_WIDTH-1:0]      error_stat; //from ine
     input   [`INTR_REG_WIDTH-1:0]       intr_stat;  //from ine
+    input   [`TASK_SWITCH_WIDTH-1:0]    tsk_stat;   //from task
     output  [`AHB_DATA_WIDTH-1:0]       ihrdata;
     output  int_reg_en;
     output  int_clr_reg_en;
     output  err_reg_en;
     output  err_clr_reg_en;
     output  [`SEMERR_WIDTH-1:0]         semerr;
+    output  task_en;
     // output  int_reg_en_1;
     // output  int_clr_reg_en_1;
     // output  err_reg_en_1;
@@ -97,6 +102,7 @@ module hsem_regfiles
     // wire    err_reg_en_1;
     // wire    err_clr_reg_en_1;
     // wire    status_reg_en_1;
+    wire    task_en;
 //----------------------------------------------
     reg [`SEM_REG_WIDTH-1:0]  sem_0;
     reg [`SEM_REG_WIDTH-1:0]  sem_1;
@@ -182,6 +188,8 @@ ii
     // assign  err_reg_en_1      = (reg_addr == `HSEM_ERROR_1_OFFSET          ) ? 1'b1 : 1'b0;
     // assign  err_clr_reg_en_1  = (reg_addr == `HSEM_ERROR_CLEAR_1_OFFSET    ) ? 1'b1 : 1'b0;
     assign  status_reg_en_1   = (reg_addr == `HSEM_STATUS_1_OFFSET       ) ? 1'b1 : 1'b0;
+// connected to the task.v
+    assign  task_en           = (reg_addr == `TASK_SWITCH_OFFSET         ) ? 1'b1 : 1'b0;
 
 // ------------------------------------------------------
 // -- semaphore reg
@@ -420,6 +428,8 @@ ii
                 ihrdata[`SEM_REG_WIDTH-1:0]  = {32{1'b0}};
             if(err_clr_reg_en == 1'b1)
                 ihrdata[`SEM_REG_WIDTH-1:0]  = {32{1'b0}};
+            if(task_en == 1'b1)
+                ihrdata[`SEM_REG_WIDTH-1:0]  = tsk_stat;
         end
 
 //-----------------------------------------------------------------------

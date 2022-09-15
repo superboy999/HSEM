@@ -41,3 +41,5 @@
 `define CORE_0_INTR 2'b10
 
 `define CORE_1_INTR 2'b11
+
+`define TASK_SWITCH_WIDTH 32
