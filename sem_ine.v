@@ -44,7 +44,7 @@ module hsem_ine
     wire [`ERROR_REG_WIDTH-1:0]  err_iw; //internal wire
     wire [`INTR_REG_WIDTH-1:0]   intr_iw; //intr_stat internal wire
     wire    intr_0;
-    wire    intr1;
+    wire    intr_1;
 
     assign  err_iw  = error;
     assign  intr_iw = interrupt;
