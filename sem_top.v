@@ -6,6 +6,7 @@
 // Last modified date :         2022/09/18
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
+`include "sem_config.v"
 module hsem_top(
     hclk,
     hresetn,
@@ -24,7 +25,7 @@ module hsem_top(
     hrdata,
     intr_0,
     intr_1
-)
+);
     input               hclk;
     input               hresetn;
     input               hsel; // In fact, hsel is same as hready in functional judgement
@@ -49,14 +50,21 @@ module hsem_top(
     wire    wr_en;
     wire    rd_en;
     wire                    [7:0]    reg_addr;
-    wire    [`INTR_REG_WIDTH-1:0]    intr_stat;
-    wire    [`ERROR_REG_WIDTH-1:0]   error_stat;
+    wire    [`INTR_REG_WIDTH-1:0]    intr_stat_0;
+    wire    [`ERROR_REG_WIDTH-1:0]   error_stat_0;
+    wire    [`INTR_REG_WIDTH-1:0]    intr_stat_1;
+    wire    [`ERROR_REG_WIDTH-1:0]   error_stat_1;
     wire    [`TASK_SWITCH_WIDTH-1:0] tsk_stat;
-    wire    int_reg_en;
-    wire    int_clr_reg_en;
-    wire    err_reg_en;
-    wire    err_clr_reg_en;
-    wire    [`SEMERR_WIDTH-1:0]      semerr;
+    wire    int_reg_en_0;
+    wire    int_clr_reg_en_0;
+    wire    err_reg_en_0;
+    wire    err_clr_reg_en_0;
+    wire    [`SEMERR_WIDTH-1:0]      semerr_0;
+    wire    int_reg_en_1;
+    wire    int_clr_reg_en_1;
+    wire    err_reg_en_1;
+    wire    err_clr_reg_en_1;
+    wire    [`SEMERR_WIDTH-1:0]      semerr_1;
     wire    task_en;
 
 
@@ -91,14 +99,21 @@ module hsem_top(
         .ihwdata(ihwdata),
         .reg_addr(reg_addr),
         .ihrdata(ihrdata),
-        .intr_stat(intr_stat),
-        .error_stat(error_stat),
+        .intr_stat_0(intr_stat_0),
+        .error_stat_0(error_stat_0),
+        .int_reg_en_0(int_reg_en_0),
+        .int_clr_reg_en_0(int_clr_reg_en_0),
+        .err_reg_en_0(err_reg_en_0),
+        .err_clr_reg_en_0(err_clr_reg_en_0),
+        .semerr_0(semerr_0),
+        .intr_stat_1(intr_stat_1),
+        .error_stat_1(error_stat_1),
+        .int_reg_en_1(int_reg_en_1),
+        .int_clr_reg_en_1(int_clr_reg_en_1),
+        .err_reg_en_1(err_reg_en_1),
+        .err_clr_reg_en_1(err_clr_reg_en_1),
+        .semerr_1(semerr_1),
         .tsk_stat(tsk_stat),
-        .int_reg_en(int_reg_en),
-        .int_clr_reg_en(int_clr_reg_en),
-        .err_reg_en(err_reg_en),
-        .err_clr_reg_en(err_clr_reg_en),
-        .semerr(semerr),
         .task_en(task_en)
     );
 
@@ -107,15 +122,22 @@ module hsem_top(
         .hresetn(hresetn),
         .wr_en(wr_en),
         .ihwdata(ihwdata),
-        .int_reg_en(int_reg_en),
-        .int_clr_reg_en(int_clr_reg_en),
-        .err_reg_en(err_reg_en),
-        .err_clr_reg_en(err_clr_reg_en),
-        .semerr(semerr),
-        .error_stat(error_stat),
+        .int_reg_en_0(int_reg_en_0),
+        .int_clr_reg_en_0(int_clr_reg_en_0),
+        .err_reg_en_0(err_reg_en_0),
+        .err_clr_reg_en_0(err_clr_reg_en_0),
+        .semerr_0(semerr_0),
+        .error_stat_0(error_stat_0),
+        .int_reg_en_1(int_reg_en_1),
+        .int_clr_reg_en_1(int_clr_reg_en_1),
+        .err_reg_en_1(err_reg_en_1),
+        .err_clr_reg_en_1(err_clr_reg_en_1),
+        .semerr_1(semerr_1),
+        .error_stat_1(error_stat_1),
         .intr_0(intr_0),
         .intr_1(intr_1),
-        .intr_stat(intr_stat)
+        .intr_stat_0(intr_stat_0),
+        .intr_stat_1(intr_stat_1)
     );
 
     hsem_task i_sem_task(

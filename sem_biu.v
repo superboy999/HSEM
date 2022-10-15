@@ -5,8 +5,10 @@
 // Abstract     :               AHB bus interface module.
 // Last modified date :         2022/09/18
 // Description :                Only the ihwdata and hrdata will be the reg
+//                              cancel the read reg, implement read func in combinational circuit
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
+`include "sem_config.v"
 module hsem_biu(
     hclk,
     hresetn,
@@ -28,7 +30,7 @@ module hsem_biu(
     wr_en,
     rd_en,
     reg_addr
-)
+);
     input               hclk;
     input               hresetn;
     input               hsel; // In fact, hsel is same as hready in functional judgement
@@ -62,13 +64,13 @@ module hsem_biu(
     wire    control_wr; // used to save data in reg
     wire    control_rd;
 
-    assign  control_wr   = htrans[1] & hsel & hready & hwdata;
-    assign  control_rd   = htrans[1] & hsel & hready & ~hwdata;    
+    assign  control_wr   = htrans[1] & hsel & hready & hwrite;
+    assign  control_rd   = htrans[1] & hsel & hready & ~hwrite;    
     assign  hresp        = 2'b00;
     assign  hreadyout    = 1'b1;
 
     always@(posedge hclk or negedge hresetn)
-        begin : save control in ahb_wr
+        begin : save_control_in_ahb_wr
             if(hresetn == 1'b0)
                 ahb_wr <= 1'b0;
             else if(control_wr == 1'b1)
@@ -78,7 +80,7 @@ module hsem_biu(
         end 
 
     always@(posedge hclk or negedge hresetn)
-        begin : save control in ahb_rd
+        begin : save_control_in_ahb_rd
             if(hresetn == 1'b0)
                 ahb_rd <= 1'b0;
             else if(control_rd == 1'b1)
@@ -88,10 +90,10 @@ module hsem_biu(
         end 
 
     always@(posedge hclk or negedge hresetn)
-        begin:reg_addr
+        begin:reg_addr_control
             if(hresetn == 1'b0)
                 reg_addr <= 8'b00000000;
-            else if(control == 1'b1)
+            else if((control_wr||control_rd) == 1'b1)
                 reg_addr <= haddr[7:0];
         end
     
@@ -99,12 +101,28 @@ module hsem_biu(
     assign  rd_en   = ahb_rd;
     assign  ihwdata = hwdata;
 
-    always@(posedge hclk or negedge hresetn)
-        begin: hrdata
+    // always@(posedge hclk or negedge hresetn)
+    //     begin: hrdata_control
+    //         if(hresetn == 1'b0)
+    //             hrdata <= 0;
+    //         else if(rd_en == 1'b1)
+    //             hrdata <= ihrdata;
+    //     end
+    
+    always@(*)
+        begin: hrdata_control
             if(hresetn == 1'b0)
-                hrdata <= 0;
+                hrdata = 0;
             else if(rd_en == 1'b1)
-                hrdata <= ihrdata;
+                hrdata = ihrdata;
         end
+
+    // always@(posedge hclk or negedge hresetn)
+    //     begin: hwdata_control
+    //         if(hresetn == 1'b0)
+    //             ihwdata <= 0;
+    //         else if(wr_en == 1'b1)
+    //             ihwdata <= hwdata;
+    //     end
 
 endmodule

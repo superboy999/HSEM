@@ -6,6 +6,7 @@
 // Last modified date :         2022/09/15
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
+`include "sem_config.v"
 module hsem_task
     (
         hclk,
@@ -14,7 +15,7 @@ module hsem_task
         ihwdata,
         task_en,
         tsk_stat
-    )
+    );
     input   hclk;
     input   hresetn;
     input   wr_en;
@@ -27,7 +28,7 @@ module hsem_task
     assign tsk_stat = task_status;
 
     always@(posedge hclk or negedge hresetn)
-        begin : task_status
+        begin : task_status_proc
             if(hresetn == 1'b0)
                 begin
                     task_status <= 32'b0;
