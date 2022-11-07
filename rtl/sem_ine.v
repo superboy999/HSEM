@@ -187,7 +187,7 @@ module hsem_ine
 
     // assign intr_0 = (interrupt == `CORE_0_INTR) ? 1'b1 : 1'b0;
     // assign intr_1 = (interrupt == `CORE_1_INTR) ? 1'b1 : 1'b0;    
-    assign intr_0 = (interrupt_0 != 0) ? 1'b1 : 1'b0;
-    assign intr_1 = (interrupt_1 != 0) ? 1'b1 : 1'b0;    
+    assign intr_0 = (interrupt_0 != 32'b0) ? 1'b1 : 1'b0;
+    assign intr_1 = (interrupt_1 != 32'b0) ? 1'b1 : 1'b0;    
 
 endmodule

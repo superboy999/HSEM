@@ -1,6 +1,6 @@
 # HSEM
 
-Hardware semaphore for dual core communication, the whole architecture is designed by Ti's databook.
+Hardware semaphore for dual core communication, the whole architecture is designed with Ti's databook.
 
 # Difference between design and Ti's databook
 
@@ -12,7 +12,7 @@ Hardware semaphore for dual core communication, the whole architecture is design
 
 ## Semaphore
 
-1. write 0x0 means lock, write 0x1 means release.
+1. write 0x1 means lock, write 0x0 means release.
 2. Delete the query mechanism, move this function to software.
 
 # Something left to do and something has been done
