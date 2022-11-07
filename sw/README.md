@@ -9,11 +9,11 @@
 ## REG LIST:
 
 1. **sem_x** (0<=x<=7), every source has its own reg.
-   ![sem regs](pics/sem_regs.png)
+   ![sem regs](../pics/sem_regs.png)
 2. **sem_status_x** (0<=x<=1), every core has its own status reg.
-   ![sem status](pics/sem_status.png)
+   ![sem status](../pics/sem_status.png)
 3. **error_x** (0<=x<=1), every core has its own error status reg.
-   ![sem error](pics/sem_err.png)
+   ![sem error](../pics/sem_err.png)
 4. **interrput_x** (0<=x<=1), every core has its own interrupt status reg.
 
 -   This reg can be set in two ways: error incurred or software set.
