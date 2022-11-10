@@ -1,4 +1,4 @@
-# This is the Software support, some drivers of the HSEM will be putted here.
+# This is the Software support, some drivers of the HSEM will be put here.
 
 ## HSEM function overview
 

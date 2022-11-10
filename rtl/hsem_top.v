@@ -6,7 +6,7 @@
 // Last modified date :         2022/09/18
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
-`include "sem_config.v"
+`include "hsem_config.v"
 module hsem_top(
     hclk,
     hresetn,
@@ -68,7 +68,7 @@ module hsem_top(
     wire    task_en;
 
 
-    hsem_biu i_sem_biu(
+    hsem_biu i_hsem_biu(
         .hclk(hclk),
         .hresetn(hresetn),
         .hsel(hsel), 
@@ -91,7 +91,7 @@ module hsem_top(
         .reg_addr(reg_addr)
     );
 
-    hsem_regfiles i_sem_regfiles(
+    hsem_regfiles i_hsem_regfiles(
         .hclk(hclk),
         .hresetn(hresetn),
         .wr_en(wr_en),
@@ -117,7 +117,7 @@ module hsem_top(
         .task_en(task_en)
     );
 
-    hsem_ine i_sem_ine(
+    hsem_ine i_hsem_ine(
         .hclk(hclk),
         .hresetn(hresetn),
         .wr_en(wr_en),
@@ -140,7 +140,7 @@ module hsem_top(
         .intr_stat_1(intr_stat_1)
     );
 
-    hsem_task i_sem_task(
+    hsem_task i_hsem_task(
         .hclk(hclk),
         .hresetn(hresetn),
         .wr_en(wr_en),
