@@ -6,8 +6,8 @@ extern "C"
 {
 #endif
 
-#define CORE_0_ID 0b101010
-#define CORE_1_ID 0b010101
+#define CORE_0_ID 0xaa
+#define CORE_1_ID 0xbb
 
 #define SW_SET 0b1
 #define ERROR 0b10
