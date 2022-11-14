@@ -1,7 +1,7 @@
 #include "hbirdv2.h"
 #include "hbirdv2_hsem.h"
 
-int32_t hsem_stat(HSEM_TypeDef *hsem, int core_id)
+uint32_t hsem_stat(HSEM_TypeDef *hsem, uint32_t core_id)
 {
     if (__RARELY(hsem == NULL))
     {
@@ -21,7 +21,7 @@ int32_t hsem_stat(HSEM_TypeDef *hsem, int core_id)
     return core_sem_stat;
 }
 
-int32_t hsem_check_lck(HSEM_TypeDef *hsem, int sem_id, int sem_stat) // the return value of this func: 1 means lock success, 0 means lock failed.
+uint32_t hsem_check_lck(HSEM_TypeDef *hsem, uint32_t sem_id, uint32_t sem_stat) // the return value of this func: 1 means lock success, 0 means lock failed.
 {
     if (__RARELY(hsem == NULL))
     {
@@ -41,7 +41,7 @@ int32_t hsem_check_lck(HSEM_TypeDef *hsem, int sem_id, int sem_stat) // the retu
     return return_code;
 }
 
-int32_t hsem_check_rls(HSEM_TypeDef *hsem, int sem_id, int sem_stat) // the return value of this func: 1 means release success, 0 means release failed.
+uint32_t hsem_check_rls(HSEM_TypeDef *hsem, uint32_t sem_id, uint32_t sem_stat) // the return value of this func: 1 means release success, 0 means release failed.
 {
     if (__RARELY(hsem == NULL))
     {
@@ -61,7 +61,7 @@ int32_t hsem_check_rls(HSEM_TypeDef *hsem, int sem_id, int sem_stat) // the retu
     return return_code;
 }
 
-int32_t hsem_try_lock(HSEM_TypeDef *hsem, int sem_id, int core_id)
+uint32_t hsem_try_lock(HSEM_TypeDef *hsem, uint32_t sem_id, uint32_t core_id)
 {
 
     if (__RARELY(hsem == NULL))
@@ -190,7 +190,7 @@ int32_t hsem_try_lock(HSEM_TypeDef *hsem, int sem_id, int core_id)
     return return_code;
 }
 
-int32_t hsem_try_rls(HSEM_TypeDef *hsem, int sem_id, int core_id)
+uint32_t hsem_try_rls(HSEM_TypeDef *hsem, uint32_t sem_id, uint32_t core_id)
 {
 
     if (__RARELY(hsem == NULL))
@@ -319,7 +319,7 @@ int32_t hsem_try_rls(HSEM_TypeDef *hsem, int sem_id, int core_id)
     return return_code;
 }
 
-void hsem_intr_trig(HSEM_TypeDef *hsem, int core_id)
+void hsem_intr_trig(HSEM_TypeDef *hsem, uint32_t core_id)
 {
     if (core_id == CORE_0_ID)
     {
