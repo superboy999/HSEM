@@ -7,7 +7,7 @@
 // Description:                 In this module, only those regs related to the semaphore will appear in this module, those regs related to the interrupt or error will appear in ine.v
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
-`include "hsem_config.v"
+// `include "hsem_config.v"
 // -----------------------------------------------------------
 // -- Register address offset macros
 // -----------------------------------------------------------

@@ -8,7 +8,7 @@
 //                              cancel the read reg, implement read func in combinational circuit
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
-`include "hsem_config.v"
+// `include "hsem_config.v"
 module hsem_biu(
     hclk,
     hresetn,

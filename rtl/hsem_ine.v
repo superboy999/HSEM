@@ -7,7 +7,7 @@
 // Description:                 interrupt will occur when error occurs and task switch 
 // -------------------------------------------------------------------
 // -------------------------------------------------------------------
-`include "hsem_config.v"
+// `include "hsem_config.v"
 module hsem_ine
     (
         hclk,

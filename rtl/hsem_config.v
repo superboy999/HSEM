@@ -36,7 +36,7 @@
 
 // `define TASK_SWITCH 2'b01
 
-`define ERROR_PRODUCED 32'b2
+`define ERROR_PRODUCED 32'b10
 
 `define CORE_0_INTR 2'b10
 
