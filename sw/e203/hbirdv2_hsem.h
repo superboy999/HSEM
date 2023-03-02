@@ -2,8 +2,7 @@
 #define _HBIRDV2_HSEM_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #define CORE_0_ID 0xaa

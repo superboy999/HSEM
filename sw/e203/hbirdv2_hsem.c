@@ -203,7 +203,7 @@ uint32_t hsem_try_rls(HSEM_TypeDef *hsem, uint32_t sem_id, uint32_t core_id)
     uint32_t sem_stat; // sem status of one core
     uint32_t return_code;
 
-    release_code = 0; // The value that will be write to the sem_x
+    release_code = ((core_id << 8) | (0b0)); // The value that will be write to the sem_x
     if (sem_id == 0)
     {
         hsem->sem_0 = release_code;
@@ -331,7 +331,7 @@ void hsem_intr_trig(HSEM_TypeDef *hsem, uint32_t core_id)
     }
 }
 
-int32_t hsem_intr_stat(HSEM_TypeDef *hsem, int core_id)
+uint32_t hsem_intr_stat(HSEM_TypeDef *hsem, uint32_t core_id)
 {
     uint32_t intr_stat;
     if (core_id == CORE_0_ID)
@@ -346,7 +346,7 @@ int32_t hsem_intr_stat(HSEM_TypeDef *hsem, int core_id)
     return intr_stat;
 }
 
-void hsem_intr_clear(HSEM_TypeDef *hsem, int core_id)
+void hsem_intr_clear(HSEM_TypeDef *hsem, uint32_t core_id)
 {
     uint32_t intr_stat;
     if (core_id == CORE_0_ID)
@@ -359,7 +359,7 @@ void hsem_intr_clear(HSEM_TypeDef *hsem, int core_id)
     }
 }
 
-int32_t hsem_err_stat(HSEM_TypeDef *hsem, int core_id)
+uint32_t hsem_err_stat(HSEM_TypeDef *hsem, uint32_t core_id)
 {
     uint32_t err_stat;
     if (core_id == CORE_0_ID)
@@ -374,7 +374,7 @@ int32_t hsem_err_stat(HSEM_TypeDef *hsem, int core_id)
     return err_stat;
 }
 
-void hsem_err_clear(HSEM_TypeDef *hsem, int core_id)
+void hsem_err_clear(HSEM_TypeDef *hsem, uint32_t core_id)
 {
     uint32_t err_stat;
     if (core_id == CORE_0_ID)
@@ -387,7 +387,7 @@ void hsem_err_clear(HSEM_TypeDef *hsem, int core_id)
     }
 }
 
-void hsem_send_task(HSEM_TypeDef *hsem, int task_code, int core_id)
+void hsem_send_task(HSEM_TypeDef *hsem, uint32_t task_code, uint32_t core_id)
 {
     hsem->task = task_code;
 
